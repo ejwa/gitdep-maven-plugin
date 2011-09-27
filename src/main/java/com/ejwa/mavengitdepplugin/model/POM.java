@@ -31,6 +31,7 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class POM {
 	private final File file;
 	private final Document document;
@@ -63,6 +64,18 @@ public class POM {
 		return project.getChild("artifactId", ns).getTextTrim();
 	}
 
+	public String getParentVersion() {
+		return project.getChild("parent", ns).getChild("version", ns).getTextTrim();
+	}
+
+	public void setParentVersion(String version) {
+		final Element parent = project.getChild("parent", ns);
+
+		if (parent != null) {
+			parent.getChild("version", ns).setText(version);
+		}
+	}
+
 	public String getVersion() {
 		return project.getChild("version", ns).getTextTrim();
 	}
@@ -84,6 +97,24 @@ public class POM {
 		}
 
 		throw new IllegalStateException("Failed to find version tag for the given dependency.");
+	}
+
+	public void setDependencyVersion(GitDependency dependency, String version) {
+		final Element dependenciesElement = project.getChild("dependencies", ns);
+
+		if (dependenciesElement != null) {
+			final List<Element> dependencies = dependenciesElement.getChildren("dependency", ns);
+
+			for (Element e : dependencies) {
+				final String groupIdFound = e.getChild("groupId", ns).getTextTrim();
+				final String artifactIdFound = e.getChild("artifactId", ns).getTextTrim();
+
+				if (dependency.getGroupId().equals(groupIdFound) &&
+				    dependency.getArtifactId().equals(artifactIdFound)) {
+					e.getChild("version", ns).setText(version);
+				}
+			}
+		}
 	}
 
 	@SuppressWarnings("PMD.DataflowAnomalyAnalysis")

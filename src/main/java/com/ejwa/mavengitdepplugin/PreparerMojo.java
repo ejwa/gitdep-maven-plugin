@@ -60,6 +60,8 @@ public class PreparerMojo extends AbstractMojo {
 
 			for (POM p : dpoms) {
 				p.setVersion(version);
+				p.setParentVersion(version);
+				p.setDependencyVersion(dependency, version);
 				new POMHandler(p).write();
 			}
 		} catch (Exception ex) {
