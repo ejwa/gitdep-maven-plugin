@@ -22,9 +22,7 @@ package com.ejwa.mavengitdepplugin;
 
 import com.ejwa.mavengitdepplugin.model.Directory;
 import com.ejwa.mavengitdepplugin.model.POM;
-import com.ejwa.mavengitdepplugin.util.DirectoryHandler;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -42,6 +40,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
  * BUILD_DIR/.maven-gitdep-NAME-VERSION-tmp/.
  *
  * @goal download
+ * @execute goal=cleanup
  */
 public class DownloaderMojo extends AbstractMojo {
 
@@ -52,20 +51,6 @@ public class DownloaderMojo extends AbstractMojo {
 	 * @parameter
 	 */
 	private List<GitDependency> gitDependencies;
-
-	private void cleanup(POM pom, GitDependency dependency) {
-		final String version = pom.getDependencyVersion(dependency);
-		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
-		final File file = new File(tempDirectory);
-
-		if (file.exists()) {
-			try {
-				DirectoryHandler.delete(new File(tempDirectory));
-			} catch (IOException ex) {
-				getLog().error(ex);
-			}
-		}
-	}
 
 	private Git clone(POM pom, GitDependency dependency) {
 		final CloneCommand c = new CloneCommand();
@@ -117,12 +102,10 @@ public class DownloaderMojo extends AbstractMojo {
 		}
 	}
 
-	@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 	public void execute() throws MojoExecutionException {
 		for (GitDependency d : gitDependencies) {
 			final POM pom = POM.getProjectPOM(getLog());
 
-			cleanup(pom, d);
 			final Git git = clone(pom, d);
 			checkout(git, pom, d);
 		}
