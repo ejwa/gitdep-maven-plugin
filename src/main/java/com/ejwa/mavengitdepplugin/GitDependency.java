@@ -24,7 +24,7 @@ public class GitDependency {
 	private String groupId;
 	private String artifactId;
 	private String location;
-	private String branch;
+	private String branch = "master";
 
 	public String getArtifactId() {
 		return artifactId;
