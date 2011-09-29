@@ -33,23 +33,7 @@ public class GitDependencyHandler {
 		this.dependency = dependency;
 	}
 
-	public String getDependencyVersion(POM pom) {
-		final Namespace ns = pom.getProject().getNamespace();
-		final List<Element> dependencies = pom.getProject().getChild("dependencies", ns).getChildren("dependency", ns);
-
-		for (Element e : dependencies) {
-			final String groupIdFound = e.getChild("groupId", ns).getTextTrim();
-			final String artifactIdFound = e.getChild("artifactId", ns).getTextTrim();
-
-			if (dependency.getGroupId().equals(groupIdFound) && dependency.getArtifactId().equals(artifactIdFound)) {
-				return e.getChild("version", ns).getTextTrim();
-			}
-		}
-
-		throw new IllegalStateException("Failed to find version tag for the given dependency.");
-	}
-
-	public void setDependencyVersion(POM pom, String version) {
+	private Element findDependencyElement(POM pom) {
 		final Namespace ns = pom.getProject().getNamespace();
 		final Element dependenciesElement = pom.getProject().getChild("dependencies", ns);
 
@@ -62,9 +46,31 @@ public class GitDependencyHandler {
 
 				if (dependency.getGroupId().equals(groupIdFound) &&
 				    dependency.getArtifactId().equals(artifactIdFound)) {
-					e.getChild("version", ns).setText(version);
+					return e;
 				}
 			}
+		}
+
+		return null;
+	}
+
+	public String getDependencyVersion(POM pom) {
+		final Element dependencyElement = findDependencyElement(pom);
+
+		if (dependencyElement != null) {
+			final Namespace ns = pom.getProject().getNamespace();
+			return dependencyElement.getChild("version", ns).getTextTrim();
+		}
+
+		throw new IllegalStateException("Failed to find version tag for the given dependency.");
+	}
+
+	public void setDependencyVersion(POM pom, String version) {
+		final Element dependencyElement = findDependencyElement(pom);
+
+		if (dependencyElement != null) {
+			final Namespace ns = pom.getProject().getNamespace();
+			dependencyElement.getChild("version", ns).setText(version);
 		}
 	}
 }
