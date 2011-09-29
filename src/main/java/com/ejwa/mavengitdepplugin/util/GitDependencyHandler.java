@@ -33,7 +33,7 @@ public class GitDependencyHandler {
 		this.dependency = dependency;
 	}
 
-	private Element findDependencyElement(POM pom) {
+	private Element findDependencyTagElement(POM pom, String tagName) {
 		final Namespace ns = pom.getProject().getNamespace();
 		final Element dependenciesElement = pom.getProject().getChild("dependencies", ns);
 
@@ -43,10 +43,11 @@ public class GitDependencyHandler {
 			for (Element e : dependencies) {
 				final String groupIdFound = e.getChild("groupId", ns).getTextTrim();
 				final String artifactIdFound = e.getChild("artifactId", ns).getTextTrim();
+				final Element tagElement = e.getChild(tagName, ns);
 
-				if (dependency.getGroupId().equals(groupIdFound) &&
+				if (tagElement != null && dependency.getGroupId().equals(groupIdFound) &&
 				    dependency.getArtifactId().equals(artifactIdFound)) {
-					return e;
+					return tagElement;
 				}
 			}
 		}
@@ -55,22 +56,31 @@ public class GitDependencyHandler {
 	}
 
 	public String getDependencyVersion(POM pom) {
-		final Element dependencyElement = findDependencyElement(pom);
+		final Element versionTag = findDependencyTagElement(pom, "version");
 
-		if (dependencyElement != null) {
-			final Namespace ns = pom.getProject().getNamespace();
-			return dependencyElement.getChild("version", ns).getTextTrim();
+		if (versionTag != null) {
+			return versionTag.getTextTrim();
 		}
 
 		throw new IllegalStateException("Failed to find version tag for the given dependency.");
 	}
 
 	public void setDependencyVersion(POM pom, String version) {
-		final Element dependencyElement = findDependencyElement(pom);
+		final Element versionTag = findDependencyTagElement(pom, "version");
 
-		if (dependencyElement != null) {
-			final Namespace ns = pom.getProject().getNamespace();
-			dependencyElement.getChild("version", ns).setText(version);
+		if (versionTag != null) {
+			versionTag.setText(version);
 		}
 	}
+
+	public String getDependencyType(POM pom) {
+		final Element typeTag = findDependencyTagElement(pom, "type");
+		return typeTag == null ? "jar" : typeTag.getTextTrim();
+	}
+
+	public String getDependencyClassifier(POM pom) {
+		final Element classifierTag = findDependencyTagElement(pom, "classifier");
+		return classifierTag == null ? "" : classifierTag.getTextTrim();
+	}
+
 }

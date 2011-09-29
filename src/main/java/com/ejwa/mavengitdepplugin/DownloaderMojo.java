@@ -22,8 +22,13 @@ package com.ejwa.mavengitdepplugin;
 
 import com.ejwa.mavengitdepplugin.model.Directory;
 import com.ejwa.mavengitdepplugin.model.POM;
+import com.ejwa.mavengitdepplugin.util.GitDependencyHandler;
+import com.ejwa.mavengitdepplugin.util.Resolver;
 import java.io.File;
 import java.util.List;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.jgit.api.CheckoutCommand;
@@ -43,6 +48,23 @@ import org.eclipse.jgit.revwalk.RevWalk;
  * @execute goal=cleanup
  */
 public class DownloaderMojo extends AbstractMojo {
+
+	/**
+	 * @parameter expression="${localRepository}"
+	 * @required
+	 * @readonly
+	 */
+	private ArtifactRepository localRepository;
+
+	/**
+	 * @component
+	 */
+	private ArtifactResolver artifactResolver;
+
+	/**
+	 * @component
+	 */
+	private ArtifactFactory artifactFactory;
 
 	/**
 	 * A list of git dependencies... These controll how to fetch git
@@ -104,12 +126,16 @@ public class DownloaderMojo extends AbstractMojo {
 		}
 	}
 
+	@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
 	public void execute() throws MojoExecutionException {
 		for (GitDependency d : gitDependencies) {
 			final POM pom = POM.getProjectPOM(getLog());
+			final Resolver resolver = new Resolver(localRepository, artifactResolver, artifactFactory);
 
-			final Git git = clone(pom, d);
-			checkout(git, pom, d);
+			if (!resolver.isInstalled(getLog(), d, pom)) {
+				final Git git = clone(pom, d);
+				checkout(git, pom, d);
+			}
 		}
 	}
 }
