@@ -20,10 +20,8 @@
  */
 package com.ejwa.mavengitdepplugin.model;
 
-import com.ejwa.mavengitdepplugin.GitDependency;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import org.apache.maven.plugin.logging.Log;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -82,39 +80,6 @@ public class POM {
 
 	public void setVersion(String version) {
 		project.getChild("version", ns).setText(version);
-	}
-
-	public String getDependencyVersion(GitDependency dependency) {
-		final List<Element> dependencies = project.getChild("dependencies", ns).getChildren("dependency", ns);
-
-		for (Element e : dependencies) {
-			final String groupIdFound = e.getChild("groupId", ns).getTextTrim();
-			final String artifactIdFound = e.getChild("artifactId", ns).getTextTrim();
-
-			if (dependency.getGroupId().equals(groupIdFound) && dependency.getArtifactId().equals(artifactIdFound)) {
-				return e.getChild("version", ns).getTextTrim();
-			}
-		}
-
-		throw new IllegalStateException("Failed to find version tag for the given dependency.");
-	}
-
-	public void setDependencyVersion(GitDependency dependency, String version) {
-		final Element dependenciesElement = project.getChild("dependencies", ns);
-
-		if (dependenciesElement != null) {
-			final List<Element> dependencies = dependenciesElement.getChildren("dependency", ns);
-
-			for (Element e : dependencies) {
-				final String groupIdFound = e.getChild("groupId", ns).getTextTrim();
-				final String artifactIdFound = e.getChild("artifactId", ns).getTextTrim();
-
-				if (dependency.getGroupId().equals(groupIdFound) &&
-				    dependency.getArtifactId().equals(artifactIdFound)) {
-					e.getChild("version", ns).setText(version);
-				}
-			}
-		}
 	}
 
 	@SuppressWarnings("PMD.DataflowAnomalyAnalysis")

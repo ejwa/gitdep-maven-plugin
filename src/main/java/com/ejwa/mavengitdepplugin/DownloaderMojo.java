@@ -59,7 +59,8 @@ public class DownloaderMojo extends AbstractMojo {
 		c.setCloneAllBranches(true);
 		c.setProgressMonitor(new TextProgressMonitor());
 
-		final String version = pom.getDependencyVersion(dependency);
+		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
+		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
 		c.setDirectory(new File(tempDirectory));
 
@@ -78,11 +79,12 @@ public class DownloaderMojo extends AbstractMojo {
 	 * plugin does not support the other formats.
 	 */
 	private void checkout(Git git, POM pom, GitDependency dependency) {
-		final String version = pom.getDependencyVersion(dependency);
+		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
+		final String version = dependencyHandler.getDependencyVersion(pom);
 
 		try {
 			final ObjectId rev = git.getRepository().resolve(version);
-			final RevCommit rc = new RevWalk( git.getRepository()).parseCommit(rev);
+			final RevCommit rc = new RevWalk(git.getRepository()).parseCommit(rev);
 			final CheckoutCommand checkout = git.checkout();
 
 			checkout.setName("maven-gitdep-branch-" + rc.getCommitTime());

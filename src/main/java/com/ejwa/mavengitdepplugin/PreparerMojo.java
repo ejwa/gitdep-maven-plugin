@@ -22,6 +22,7 @@ package com.ejwa.mavengitdepplugin;
 
 import com.ejwa.mavengitdepplugin.model.Directory;
 import com.ejwa.mavengitdepplugin.model.POM;
+import com.ejwa.mavengitdepplugin.util.GitDependencyHandler;
 import com.ejwa.mavengitdepplugin.util.POMHandler;
 import java.io.File;
 import java.util.List;
@@ -53,15 +54,17 @@ public class PreparerMojo extends AbstractMojo {
 	 */
 	@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
 	private void prepare(POM pom, GitDependency dependency) {
-		final String version = pom.getDependencyVersion(dependency);
+		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
+		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
+
 		try {
 			final List<POM> dpoms = POMHandler.locate(new File(tempDirectory), dependency);
 
 			for (POM p : dpoms) {
 				p.setVersion(version);
 				p.setParentVersion(version);
-				p.setDependencyVersion(dependency, version);
+				dependencyHandler.setDependencyVersion(p, version);
 				new POMHandler(p).write();
 			}
 		} catch (Exception ex) {

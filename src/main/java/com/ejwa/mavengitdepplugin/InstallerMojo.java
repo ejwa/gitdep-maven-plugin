@@ -22,6 +22,7 @@ package com.ejwa.mavengitdepplugin;
 
 import com.ejwa.mavengitdepplugin.model.Directory;
 import com.ejwa.mavengitdepplugin.model.POM;
+import com.ejwa.mavengitdepplugin.util.GitDependencyHandler;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +52,8 @@ public class InstallerMojo extends AbstractMojo {
 	private List<GitDependency> gitDependencies;
 
 	private void install(POM pom, GitDependency dependency) {
-		final String version = pom.getDependencyVersion(dependency);
+		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
+		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
 		final InvocationRequest request = new DefaultInvocationRequest();
 		final Invoker invoker = new DefaultInvoker();
@@ -71,7 +73,6 @@ public class InstallerMojo extends AbstractMojo {
 	}
 
 	public void execute() throws MojoExecutionException {
-
 		for (GitDependency d : gitDependencies) {
 			final POM pom = POM.getProjectPOM(getLog());
 			install(pom, d);

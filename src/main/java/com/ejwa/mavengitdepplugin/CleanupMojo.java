@@ -23,6 +23,7 @@ package com.ejwa.mavengitdepplugin;
 import com.ejwa.mavengitdepplugin.model.Directory;
 import com.ejwa.mavengitdepplugin.model.POM;
 import com.ejwa.mavengitdepplugin.util.DirectoryHandler;
+import com.ejwa.mavengitdepplugin.util.GitDependencyHandler;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -45,7 +46,8 @@ public class CleanupMojo extends AbstractMojo {
 	private List<GitDependency> gitDependencies;
 
 	private void cleanup(POM pom, GitDependency dependency) {
-		final String version = pom.getDependencyVersion(dependency);
+		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
+		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
 		final File file = new File(tempDirectory);
 
