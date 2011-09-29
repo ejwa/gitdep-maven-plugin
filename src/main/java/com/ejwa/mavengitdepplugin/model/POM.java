@@ -50,6 +50,10 @@ public class POM {
 		return document;
 	}
 
+	public Element getProject() {
+		return project;
+	}
+
 	public File getFile() {
 		return file;
 	}
