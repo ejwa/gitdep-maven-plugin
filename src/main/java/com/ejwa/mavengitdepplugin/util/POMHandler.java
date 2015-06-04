@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Ejwa Software. All rights reserved.
+ * Copyright © 2011-2015 Ejwa Software. All rights reserved.
  *
  * This file is part of maven-gitdep-plugin. maven-gitdep-plugin
  * enables the use of git dependencies in Maven 3.
@@ -42,7 +42,7 @@ public class POMHandler {
 	public void write() throws IOException {
 		final XMLOutputter xml = new XMLOutputter(Format.getPrettyFormat());
 		final OutputStream output = new FileOutputStream(pom.getFile());
-		
+
 		try {
 			xml.output(pom.getDocument(), output);
 		} finally {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Ejwa Software. All rights reserved.
+ * Copyright © 2011-2015 Ejwa Software. All rights reserved.
  *
  * This file is part of maven-gitdep-plugin. maven-gitdep-plugin
  * enables the use of git dependencies in Maven 3.
