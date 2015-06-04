@@ -22,6 +22,7 @@ package com.ejwa.gitdepmavenplugin.model;
 
 import java.io.File;
 import java.io.IOException;
+import lombok.Getter;
 import org.apache.maven.plugin.logging.Log;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -31,9 +32,9 @@ import org.jdom.input.SAXBuilder;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class POM {
-	private final File file;
-	private final Document document;
-	private final Element project;
+	@Getter private final File file;
+	@Getter private final Document document;
+	@Getter private final Element project;
 	private final Namespace ns;
 
 	public POM(File pomFile) throws IOException, JDOMException {
@@ -44,18 +45,6 @@ public class POM {
 		ns = project.getNamespace();
 		document = doc;
 		file = pomFile;
-	}
-
-	public Document getDocument() {
-		return document;
-	}
-
-	public Element getProject() {
-		return project;
-	}
-
-	public File getFile() {
-		return file;
 	}
 
 	public String getGroupId() {

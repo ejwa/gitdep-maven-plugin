@@ -1,5 +1,3 @@
-package com.ejwa.gitdepmavenplugin;
-
 /*
  * Copyright © 2011-2015 Ejwa Software. All rights reserved.
  *
@@ -20,41 +18,14 @@ package com.ejwa.gitdepmavenplugin;
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+package com.ejwa.gitdepmavenplugin;
+
+import lombok.Getter;
+import lombok.Setter;
+
 public class GitDependency {
-	private String groupId;
-	private String artifactId;
-	private String location;
-	private String branch = "master";
-
-	public String getArtifactId() {
-		return artifactId;
-	}
-
-	public void setArtifactId(String artifactId) {
-		this.artifactId = artifactId;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	public String getBranch() {
-		return branch;
-	}
-
-	public void setBranch(String branch) {
-		this.branch = branch;
-	}
+	@Getter @Setter private String groupId;
+	@Getter @Setter private String artifactId;
+	@Getter @Setter private String location;
+	@Getter @Setter private String branch = "master";
 }
