@@ -5,7 +5,7 @@
 	<groupId>com.ejwa</groupId>
 	<artifactId>gitdep-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>0.1</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<name>Gitdep Maven Plugin</name>
 	<repositories>
 		<repository>
