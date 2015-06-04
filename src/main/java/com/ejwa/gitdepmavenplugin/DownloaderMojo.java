@@ -18,12 +18,12 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.ejwa.mavengitdepplugin;
+package com.ejwa.gitdepmavenplugin;
 
-import com.ejwa.mavengitdepplugin.model.Directory;
-import com.ejwa.mavengitdepplugin.model.POM;
-import com.ejwa.mavengitdepplugin.util.GitDependencyHandler;
-import com.ejwa.mavengitdepplugin.util.Resolver;
+import com.ejwa.gitdepmavenplugin.model.Directory;
+import com.ejwa.gitdepmavenplugin.model.POM;
+import com.ejwa.gitdepmavenplugin.util.GitDependencyHandler;
+import com.ejwa.gitdepmavenplugin.util.Resolver;
 import java.io.File;
 import java.util.List;
 import org.apache.maven.artifact.factory.ArtifactFactory;

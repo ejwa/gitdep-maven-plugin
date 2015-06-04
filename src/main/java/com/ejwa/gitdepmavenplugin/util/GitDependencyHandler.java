@@ -18,10 +18,10 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.ejwa.mavengitdepplugin.util;
+package com.ejwa.gitdepmavenplugin.util;
 
-import com.ejwa.mavengitdepplugin.GitDependency;
-import com.ejwa.mavengitdepplugin.model.POM;
+import com.ejwa.gitdepmavenplugin.GitDependency;
+import com.ejwa.gitdepmavenplugin.model.POM;
 import java.util.List;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -38,6 +38,7 @@ public class GitDependencyHandler {
 		final Element dependenciesElement = pom.getProject().getChild("dependencies", ns);
 
 		if (dependenciesElement != null) {
+			@SuppressWarnings("unchecked")
 			final List<Element> dependencies = dependenciesElement.getChildren("dependency", ns);
 
 			for (Element e : dependencies) {

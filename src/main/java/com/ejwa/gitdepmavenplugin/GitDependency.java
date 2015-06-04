@@ -1,3 +1,5 @@
+package com.ejwa.gitdepmavenplugin;
+
 /*
  * Copyright © 2011-2015 Ejwa Software. All rights reserved.
  *
@@ -18,24 +20,41 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.ejwa.mavengitdepplugin.util;
+public class GitDependency {
+	private String groupId;
+	private String artifactId;
+	private String location;
+	private String branch = "master";
 
-import java.io.File;
-import java.io.IOException;
-
-final public class DirectoryHandler {
-	private DirectoryHandler() {
+	public String getArtifactId() {
+		return artifactId;
 	}
 
-	public static void delete(File path) throws IOException {
-		if (path.isDirectory()) {
-			for (File f : path.listFiles()) {
-				delete(f);
-			}
-		}
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
+	}
 
-		if (!path.delete()) {
-			throw new IOException("Failed to delete: " + path);
-		}
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getBranch() {
+		return branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
 	}
 }

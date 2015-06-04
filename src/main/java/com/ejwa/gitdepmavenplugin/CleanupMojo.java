@@ -18,24 +18,24 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.ejwa.mavengitdepplugin;
+package com.ejwa.gitdepmavenplugin;
 
-import com.ejwa.mavengitdepplugin.model.Directory;
-import com.ejwa.mavengitdepplugin.model.POM;
-import com.ejwa.mavengitdepplugin.util.GitDependencyHandler;
-import com.ejwa.mavengitdepplugin.util.POMHandler;
+import com.ejwa.gitdepmavenplugin.model.Directory;
+import com.ejwa.gitdepmavenplugin.model.POM;
+import com.ejwa.gitdepmavenplugin.util.DirectoryHandler;
+import com.ejwa.gitdepmavenplugin.util.GitDependencyHandler;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * Goal which compiles and installs previously downloaded
- * dependencies.
+ * Goal which cleans up the activities of maven-gitdep-plugin.
  *
- * @goal prepare
+ * @goal cleanup
  */
-public class PreparerMojo extends AbstractMojo {
+public class CleanupMojo extends AbstractMojo {
 
 	/**
 	 * A list of git dependencies... These controll how to fetch git
@@ -45,37 +45,25 @@ public class PreparerMojo extends AbstractMojo {
 	 */
 	private List<GitDependency> gitDependencies;
 
-	/*
-	 * Prepares the project POM files and makes them ready for the next
-	 * goal in the build lifecycle. Right now, this simply means modifying
-	 * the version to correlate with the checked out git hash version.
-	 * The pom files are only modified if the groupId matches and the
-	 * artifactId has a substring match.
-	 */
-	@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-	private void prepare(POM pom, GitDependency dependency) {
+	private void cleanup(POM pom, GitDependency dependency) {
 		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
 		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
+		final File file = new File(tempDirectory);
 
-		try {
-			final List<POM> dpoms = POMHandler.locate(new File(tempDirectory), dependency);
-
-			for (POM p : dpoms) {
-				p.setVersion(version);
-				p.setParentVersion(version);
-				dependencyHandler.setDependencyVersion(p, version);
-				new POMHandler(p).write();
+		if (file.exists()) {
+			try {
+				DirectoryHandler.delete(new File(tempDirectory));
+			} catch (IOException ex) {
+				getLog().error(ex);
 			}
-		} catch (Exception ex) {
-			getLog().error(ex);
 		}
 	}
 
 	public void execute() throws MojoExecutionException {
 		for (GitDependency d : gitDependencies) {
 			final POM pom = POM.getProjectPOM(getLog());
-			prepare(pom, d);
+			cleanup(pom, d);
 		}
 	}
 }

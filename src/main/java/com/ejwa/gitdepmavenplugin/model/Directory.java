@@ -18,7 +18,7 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.ejwa.mavengitdepplugin.model;
+package com.ejwa.gitdepmavenplugin.model;
 
 final public class Directory {
 	private Directory() {

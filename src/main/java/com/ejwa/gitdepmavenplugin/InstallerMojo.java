@@ -18,24 +18,30 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.ejwa.mavengitdepplugin;
+package com.ejwa.gitdepmavenplugin;
 
-import com.ejwa.mavengitdepplugin.model.Directory;
-import com.ejwa.mavengitdepplugin.model.POM;
-import com.ejwa.mavengitdepplugin.util.DirectoryHandler;
-import com.ejwa.mavengitdepplugin.util.GitDependencyHandler;
+import com.ejwa.gitdepmavenplugin.model.Directory;
+import com.ejwa.gitdepmavenplugin.model.POM;
+import com.ejwa.gitdepmavenplugin.util.GitDependencyHandler;
 import java.io.File;
-import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 
 /**
- * Goal which cleans up the activities of maven-gitdep-plugin.
+ * Goal which compiles and installs previously downloaded
+ * dependencies.
  *
- * @goal cleanup
+ * @goal install
  */
-public class CleanupMojo extends AbstractMojo {
+public class InstallerMojo extends AbstractMojo {
 
 	/**
 	 * A list of git dependencies... These controll how to fetch git
@@ -45,25 +51,31 @@ public class CleanupMojo extends AbstractMojo {
 	 */
 	private List<GitDependency> gitDependencies;
 
-	private void cleanup(POM pom, GitDependency dependency) {
+	private void install(POM pom, GitDependency dependency) {
 		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
 		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
-		final File file = new File(tempDirectory);
+		final InvocationRequest request = new DefaultInvocationRequest();
+		final Invoker invoker = new DefaultInvoker();
 
-		if (file.exists()) {
-			try {
-				DirectoryHandler.delete(new File(tempDirectory));
-			} catch (IOException ex) {
-				getLog().error(ex);
+		request.setPomFile(new File(tempDirectory + "/pom.xml"));
+		request.setGoals(Collections.singletonList("install"));
+
+		try {
+			final InvocationResult result = invoker.execute(request);
+
+			if (result.getExitCode() != 0) {
+				throw new IllegalStateException("Build failed.");
 			}
+		} catch (MavenInvocationException ex) {
+			getLog().debug(ex);
 		}
 	}
 
 	public void execute() throws MojoExecutionException {
 		for (GitDependency d : gitDependencies) {
 			final POM pom = POM.getProjectPOM(getLog());
-			cleanup(pom, d);
+			install(pom, d);
 		}
 	}
 }
