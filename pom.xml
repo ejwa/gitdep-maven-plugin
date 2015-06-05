@@ -11,6 +11,19 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+	<distributionManagement>
+		<repository>
+			<id>ejwa-public</id>
+			<name>Public Ejwa Maven repository</name>
+			<uniqueVersion>true</uniqueVersion>
+			<url>scp://ejwa.se:4096/var/maven/public/</url>
+		</repository>
+	</distributionManagement>
+
+	<scm>
+		<developerConnection>scm:git:file://.</developerConnection>
+	</scm>
+
 	<repositories>
 		<repository>
 			<id>jgit-repository</id>
@@ -64,6 +77,11 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>com.ejwa</groupId>
+				<artifactId>unleash-maven-plugin</artifactId>
+				<version>0.0.2</version>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
