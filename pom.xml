@@ -16,6 +16,11 @@
 			<id>jgit-repository</id>
 			<url>http://download.eclipse.org/jgit/maven</url>
 		</repository>
+		<repository>
+			<id>ejwa-public</id>
+			<url>http://maven.ejwa.se</url>
+			<name>Public Ejwa Software Maven Repository</name>
+		</repository>
 	</repositories>
 
 	<dependencies>
