@@ -85,7 +85,7 @@
 								<artifactItem>
 									<groupId>com.ejwa</groupId>
 									<artifactId>quality</artifactId>
-									<version>0.0.1</version>
+									<version>0.0.2</version>
 
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}/quality</outputDirectory>
