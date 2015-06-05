@@ -18,10 +18,11 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+
 package com.ejwa.gitdepmavenplugin;
 
 import com.ejwa.gitdepmavenplugin.model.Directory;
-import com.ejwa.gitdepmavenplugin.model.POM;
+import com.ejwa.gitdepmavenplugin.model.Pom;
 import com.ejwa.gitdepmavenplugin.util.DirectoryHandler;
 import com.ejwa.gitdepmavenplugin.util.GitDependencyHandler;
 import java.io.File;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Goal which cleans up the activities of maven-gitdep-plugin.
@@ -36,16 +38,9 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @goal cleanup
  */
 public class CleanupMojo extends AbstractMojo {
+	@Parameter private List<GitDependency> gitDependencies;
 
-	/**
-	 * A list of git dependencies... These controll how to fetch git
-	 * dependencies from an external source.
-	 *
-	 * @parameter
-	 */
-	private List<GitDependency> gitDependencies;
-
-	private void cleanup(POM pom, GitDependency dependency) {
+	private void cleanup(Pom pom, GitDependency dependency) throws MojoExecutionException {
 		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
 		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
@@ -60,9 +55,10 @@ public class CleanupMojo extends AbstractMojo {
 		}
 	}
 
+	@Override
 	public void execute() throws MojoExecutionException {
 		for (GitDependency d : gitDependencies) {
-			final POM pom = POM.getProjectPOM(getLog());
+			final Pom pom = Pom.getProjectPom();
 			cleanup(pom, d);
 		}
 	}

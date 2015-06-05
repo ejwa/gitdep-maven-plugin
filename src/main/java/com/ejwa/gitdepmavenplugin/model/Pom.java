@@ -18,12 +18,13 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+
 package com.ejwa.gitdepmavenplugin.model;
 
 import java.io.File;
 import java.io.IOException;
 import lombok.Getter;
-import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -31,13 +32,13 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-public class POM {
+public class Pom {
 	@Getter private final File file;
 	@Getter private final Document document;
 	@Getter private final Element project;
 	private final Namespace ns;
 
-	public POM(File pomFile) throws IOException, JDOMException {
+	public Pom(File pomFile) throws IOException, JDOMException {
 		final SAXBuilder builder = new SAXBuilder();
 		final Document doc = builder.build(pomFile);
 
@@ -76,14 +77,13 @@ public class POM {
 	}
 
 	@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-	public static POM getProjectPOM(Log log) {
-		final POM pom;
+	public static Pom getProjectPom() throws MojoExecutionException {
+		final Pom pom;
 
 		try {
-			pom = new POM(new File("pom.xml"));
-		} catch (Exception ex) {
-			log.error(ex);
-			throw new IllegalStateException("Failed to process POM file.");
+			pom = new Pom(new File("pom.xml"));
+		} catch (IOException | JDOMException ex) {
+			throw new MojoExecutionException("Failed to process POM file.", ex);
 		}
 
 		return pom;

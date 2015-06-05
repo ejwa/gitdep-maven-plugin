@@ -18,11 +18,13 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+
 package com.ejwa.gitdepmavenplugin.util;
 
 import com.ejwa.gitdepmavenplugin.GitDependency;
-import com.ejwa.gitdepmavenplugin.model.POM;
+import com.ejwa.gitdepmavenplugin.model.Pom;
 import java.util.List;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -33,9 +35,10 @@ public class GitDependencyHandler {
 		this.dependency = dependency;
 	}
 
-	private Element findDependencyTagElement(POM pom, String tagName) {
-		final Namespace ns = pom.getProject().getNamespace();
-		final Element dependenciesElement = pom.getProject().getChild("dependencies", ns);
+	private Element findDependencyTagElement(Pom pom, String tagName) {
+		final Element project = pom.getProject();
+		final Namespace ns = project.getNamespace();
+		final Element dependenciesElement = project.getChild("dependencies", ns);
 
 		if (dependenciesElement != null) {
 			@SuppressWarnings("unchecked")
@@ -56,17 +59,18 @@ public class GitDependencyHandler {
 		return null;
 	}
 
-	public String getDependencyVersion(POM pom) {
+	public String getDependencyVersion(Pom pom) throws MojoExecutionException {
 		final Element versionTag = findDependencyTagElement(pom, "version");
 
 		if (versionTag != null) {
 			return versionTag.getTextTrim();
 		}
 
-		throw new IllegalStateException("Failed to find version tag for the given dependency.");
+		throw new MojoExecutionException(String.format("Failed to find version tag for dependency '%s.%s'.",
+			dependency.getGroupId(), dependency.getArtifactId()));
 	}
 
-	public void setDependencyVersion(POM pom, String version) {
+	public void setDependencyVersion(Pom pom, String version) {
 		final Element versionTag = findDependencyTagElement(pom, "version");
 
 		if (versionTag != null) {
@@ -74,14 +78,13 @@ public class GitDependencyHandler {
 		}
 	}
 
-	public String getDependencyType(POM pom) {
+	public String getDependencyType(Pom pom) {
 		final Element typeTag = findDependencyTagElement(pom, "type");
 		return typeTag == null ? "jar" : typeTag.getTextTrim();
 	}
 
-	public String getDependencyClassifier(POM pom) {
+	public String getDependencyClassifier(Pom pom) {
 		final Element classifierTag = findDependencyTagElement(pom, "classifier");
 		return classifierTag == null ? "" : classifierTag.getTextTrim();
 	}
-
 }

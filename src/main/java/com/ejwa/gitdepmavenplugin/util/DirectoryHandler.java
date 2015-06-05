@@ -18,19 +18,23 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+
 package com.ejwa.gitdepmavenplugin.util;
 
 import java.io.File;
 import java.io.IOException;
+import lombok.NoArgsConstructor;
 
-final public class DirectoryHandler {
-	private DirectoryHandler() {
-	}
-
+@NoArgsConstructor
+public final class DirectoryHandler {
 	public static void delete(File path) throws IOException {
 		if (path.isDirectory()) {
-			for (File f : path.listFiles()) {
-				delete(f);
+			final File[] files = path.listFiles();
+
+			if (files != null) {
+				for (File f : files) {
+					delete(f);
+				}
 			}
 		}
 

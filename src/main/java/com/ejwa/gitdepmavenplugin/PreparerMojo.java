@@ -18,32 +18,33 @@
  * Public License along with maven-gitdep-plugin. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+
 package com.ejwa.gitdepmavenplugin;
 
 import com.ejwa.gitdepmavenplugin.model.Directory;
-import com.ejwa.gitdepmavenplugin.model.POM;
+import com.ejwa.gitdepmavenplugin.model.Pom;
 import com.ejwa.gitdepmavenplugin.util.GitDependencyHandler;
-import com.ejwa.gitdepmavenplugin.util.POMHandler;
+import com.ejwa.gitdepmavenplugin.util.PomHandler;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.jdom.JDOMException;
 
 /**
  * Goal which compiles and installs previously downloaded
  * dependencies.
- *
- * @goal prepare
  */
+@Mojo(name = "prepare")
 public class PreparerMojo extends AbstractMojo {
-
 	/**
 	 * A list of git dependencies... These controll how to fetch git
 	 * dependencies from an external source.
-	 *
-	 * @parameter
 	 */
-	private List<GitDependency> gitDependencies;
+	@Parameter private List<GitDependency> gitDependencies;
 
 	/*
 	 * Prepares the project POM files and makes them ready for the next
@@ -53,28 +54,30 @@ public class PreparerMojo extends AbstractMojo {
 	 * artifactId has a substring match.
 	 */
 	@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-	private void prepare(POM pom, GitDependency dependency) {
+	private void prepare(Pom pom, GitDependency dependency) throws MojoExecutionException {
 		final GitDependencyHandler dependencyHandler = new GitDependencyHandler(dependency);
 		final String version = dependencyHandler.getDependencyVersion(pom);
 		final String tempDirectory = Directory.getTempDirectoryString(dependency.getLocation(), version);
 
 		try {
-			final List<POM> dpoms = POMHandler.locate(new File(tempDirectory), dependency);
+			final List<Pom> dpoms = PomHandler.locate(new File(tempDirectory), dependency);
 
-			for (POM p : dpoms) {
+			for (Pom p : dpoms) {
 				p.setVersion(version);
 				p.setParentVersion(version);
 				dependencyHandler.setDependencyVersion(p, version);
-				new POMHandler(p).write();
+				new PomHandler(p).write();
 			}
-		} catch (Exception ex) {
-			getLog().error(ex);
+		} catch (IOException | JDOMException ex) {
+			throw new MojoExecutionException(String.format("Failed to prepare dependency '%s.%s'.",
+				dependency.getGroupId(), dependency.getArtifactId()), ex);
 		}
 	}
 
+	@Override
 	public void execute() throws MojoExecutionException {
 		for (GitDependency d : gitDependencies) {
-			final POM pom = POM.getProjectPOM(getLog());
+			final Pom pom = Pom.getProjectPom();
 			prepare(pom, d);
 		}
 	}
